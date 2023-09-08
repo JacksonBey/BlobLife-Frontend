@@ -1,5 +1,6 @@
 let Users = []
-let userUrl = 'https://bloblife-api.herokuapp.com/users'
+// let userUrl = 'https://bloblife-api.herokuapp.com/users'
+let userUrl = 'http://localhost:3000/users'
 const body = document.querySelector('body')
 
 function userForm() {

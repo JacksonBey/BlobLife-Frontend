@@ -1,5 +1,9 @@
-let scoreUrl = 'https://bloblife-api.herokuapp.com/scores'
-let leaderboardUrl = 'https://bloblife-api.herokuapp.com/leaderboards'
+// let scoreUrl = 'https://bloblife-api.herokuapp.com/scores'
+// let leaderboardUrl = 'https://bloblife-api.herokuapp.com/leaderboards'
+
+let scoreUrl = 'http://localhost:3000/scores'
+let leaderboardUrl = 'http://localhost:3000/leaderboards'
+
 // const body = document.querySelector('body')
 let counterDiv= document.createElement('div')
 let counter = document.createElement('p')
