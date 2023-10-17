@@ -1,5 +1,6 @@
 function startBlob(chosenColor){
     getLeaderBoards()
+    addLeaderBoard()
     startTime()
     const body = document.querySelector('body')
     // let formDiv = document.getElementById('formDiv')
@@ -65,6 +66,7 @@ function startBlob(chosenColor){
     gameLevels[0].push(new Platform(screenSize * 5/8, screenSize * 17/80, screenSize * 2/80, screenSize * 4/80));
     gameLevels[0].push(new Platform(0, screenSize * 15/80, screenSize * 7/8, screenSize * 2/80));
     gameLevels[0].push(new Platform(0, -screenSize * 1/2, screenSize, screenSize * 1/2));
+
     gameLevels[1].push(new Platform(0, screenSize - screenSize * 1/80, screenSize, screenSize * 1/80, true));
     gameLevels[1].push(new Platform(screenSize * 65/80, screenSize * 7/8, screenSize * 15/80, screenSize * 2/80));
     gameLevels[1].push(new Platform(screenSize * 1/2, screenSize * 7/8, screenSize * 15/80, screenSize * 2/80));
@@ -81,7 +83,7 @@ function startBlob(chosenColor){
     gameLevels[2].push(new Platform(screenSize * 1/4, screenSize * 66/80, screenSize * 12/80, screenSize * 10/80));
     gameLevels[2].push(new Platform(screenSize * 36/80, screenSize * 485/800, screenSize * 13/80, screenSize * 130/800));
     gameLevels[2].push(new Platform(screenSize * 100/800, screenSize * 484/800, screenSize * 190/800, screenSize * 30/800));
-    gameLevels[2].push(new Platform(screenSize * 10/800, screenSize * 255/800, screenSize * 13/80, screenSize * 130/800));
+    gameLevels[2].push(new Platform(screenSize * 10/800, screenSize * 270/800, screenSize * 13/80, screenSize * 130/800));
     gameLevels[2].push(new Platform(screenSize * 185/800, screenSize * 315/800, screenSize * 50/800, screenSize * 40/800));
     gameLevels[2].push(new Platform(screenSize * 80/800, screenSize * 160/800, screenSize * 190/800, screenSize * 30/800));
     gameLevels[2].push(new Platform(screenSize * 80/800, screenSize * 160/800, screenSize * 190/800, screenSize * 30/800));

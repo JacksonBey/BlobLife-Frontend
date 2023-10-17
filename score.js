@@ -9,7 +9,9 @@ let counterDiv= document.createElement('div')
 let counter = document.createElement('p')
 counter.textContent = `Time: 0`
 counterDiv.appendChild(counter)
-
+if(Users !== null) {
+Users = getUsers();
+}
 
 
 let sidebar = document.createElement('div')
@@ -74,57 +76,96 @@ function compare(a, b) {
 
 
 
-function addLeaderBoard(leaderboards, scores){
-    let todaysBoard = leaderboards.find(leaderboard => leaderboard.date === date);
-    let todaysScores = scores.filter(score => score.date === date);
+// function addLeaderBoard(leaderboards, scores){
+//     let todaysBoard = leaderboards.find(leaderboard => leaderboard.date === date);
+//     let todaysScores = scores.filter(score => score.date === date);
 
-    // todaysScores.sort(compare)
-    if ((!!todaysBoard)) {
-        let boardDiv = document.createElement('div')
-        boardDiv.setAttribute('class', 'leaderboard')
-        // console.log(leaderboards)
+//     // todaysScores.sort(compare)
+//     if ((!!todaysBoard)) {
+//         let boardDiv = document.createElement('div')
+//         boardDiv.setAttribute('class', 'leaderboard')
+//         // console.log(leaderboards)
 
-        let ul = document.createElement('ul')
-        ul.textContent = `${todaysBoard.date}'s Top 10 Scores:`
-        ul.id = `${todaysBoard.id}l` // l for leaderboard
+//         let ul = document.createElement('ul')
+//         ul.textContent = `${todaysBoard.date}'s Top 10 Scores:`
+//         ul.id = `${todaysBoard.id}l` // l for leaderboard
 
 
 
-        boardDiv.append(ul)
-        sidebar.append(boardDiv)
+//         boardDiv.append(ul)
+//         sidebar.append(boardDiv)
 
-        postScores(todaysScores, todaysBoard)
+//         postScores(todaysScores, todaysBoard)
+
+//     } else {
+//         // fetch((leaderboardUrl), {
+//         //     method: 'POST',
+//         //     headers: {
+//         //         'Content-Type': 'application/json',
+//         //         'Accept': 'application/json'
+//         //     },
+//         //     body: JSON.stringify({
+//         //         'date': date
+//         //     })
+
+//         // })
+//         // .then(res => res.json())
+//         // .then(todaysBoard => {
+//         //     let boardDiv = document.createElement('div')
+//         //     boardDiv.setAttribute('class', 'leaderboard')
+
+//         //     let ul = document.createElement('ul')
+//         //     ul.textContent = `${todaysBoard.date}'s Top 10 Scores:`
+//         //     ul.id = `${todaysBoard.id}l` // l for leaderboard
+//         //     leaderboards.push(todaysBoard)
+//         //     boardDiv.append(ul)
+//         //     sidebar.append(boardDiv)
+//         // })
+//         let newBoard = {
+//             'date': date
+//         };
+//         leaderboards.push(newBoard);
+//         localStorage.setItem('leaderboards', JSON.stringify(leaderboards));
+//     }
+// }
+
+function addLeaderBoard() {
+        // let boardDiv = document.createElement('div')
+        // boardDiv.setAttribute('class', 'leaderboard')
+        // boardDiv.setAttribute('id', 'mainLeaderboard')
+
+        // // console.log(leaderboards)
+
+        // let ul = document.createElement('ul')
+        // ul.textContent = `Top Scores:`;
+        // ul.id = `mainLeaderboard`; 
+
+
+
+        // boardDiv.append(ul)
+        // sidebar.append(boardDiv)
+
+    // let ul;
+    let todaysScores = getScores();
+
+    if (!document.getElementById("mainLeaderboard")) {
+        let boardDiv = document.createElement('div');
+        boardDiv.setAttribute('class', 'leaderboard');
+
+        ul = document.createElement('ul');
+        ul.textContent = `Top Scores:`;
+        ul.id = `mainLeaderboard`; 
+
+        boardDiv.append(ul);
+        sidebar.append(boardDiv);
+        postScores(todaysScores);
 
     } else {
-        // fetch((leaderboardUrl), {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //         'Accept': 'application/json'
-        //     },
-        //     body: JSON.stringify({
-        //         'date': date
-        //     })
+        ul = document.getElementById("mainLeaderboard");
+        postScores(todaysScores);
 
-        // })
-        // .then(res => res.json())
-        // .then(todaysBoard => {
-        //     let boardDiv = document.createElement('div')
-        //     boardDiv.setAttribute('class', 'leaderboard')
-
-        //     let ul = document.createElement('ul')
-        //     ul.textContent = `${todaysBoard.date}'s Top 10 Scores:`
-        //     ul.id = `${todaysBoard.id}l` // l for leaderboard
-        //     leaderboards.push(todaysBoard)
-        //     boardDiv.append(ul)
-        //     sidebar.append(boardDiv)
-        // })
-        let newBoard = {
-            'date': date
-        };
-        leaderboards.push(newBoard);
-        localStorage.setItem('leaderboards', JSON.stringify(leaderboards));
     }
+
 }
 
 let paused = false;
@@ -152,8 +193,6 @@ function startTime() {
 }
 
 function createScore(time, userid) {
-    let todaysBoard = leaderboards.find(leaderboard => leaderboard.date === date);
-    let todaysScores = scores.filter(score => score.date === date);
     let blobinfo = document.getElementById('blob').textContent;
     let blobtype;
     if (blobinfo === 'Blob type: Gold'){
@@ -171,14 +210,12 @@ function createScore(time, userid) {
     let newScore = {
         'time': time,
         'user_id': userid,
-        'leaderboard_id': todaysBoard.id,
-        'date': date,
+        'date': date, // The date the score was achieved
         'blobtype': blobtype
     };
     scores.push(newScore);
-    todaysScores.push(newScore);
     localStorage.setItem('scores', JSON.stringify(scores));
-    postScores(todaysScores, todaysBoard);
+    postScores([newScore]);
 
     // fetch((scoreUrl), {
     //     method: 'POST',
@@ -222,13 +259,32 @@ function createScore(time, userid) {
 //     ul.append(li)
 // })
 
-function postScores(todaysScores, todaysBoard) {
-    // let todaysBoard = leaderboards.find(leaderboard => leaderboard.date === date)
-    let ul = document.getElementById(`${todaysBoard.id}l`)
-    ul.innerHTML = ''
-    ul.textContent = `${todaysBoard.date}'s Top 10 Scores:`
-    todaysScores.sort(compare)
-    let i = 1 
+function postScores(todaysScores) {
+    if (!document.getElementById("mainLeaderboard")) {
+        let boardDiv = document.createElement('div');
+        boardDiv.setAttribute('class', 'leaderboard');
+
+        ul = document.createElement('ul');
+        ul.textContent = `Top Scores:`;
+        ul.id = `mainLeaderboard`; 
+
+        boardDiv.append(ul);
+        sidebar.append(boardDiv);
+        // postScores(todaysScores);
+
+    } else {
+        ul = document.getElementById("mainLeaderboard");
+        // postScores(todaysScores);
+
+    }
+
+
+
+    // let ul = document.getElementById("mainLeaderboard");
+    ul.innerHTML = '';
+    // ul.textContent = `Top 10 Scores:`;
+    todaysScores.sort(compare);
+    let i = 1;
     todaysScores.forEach(score => {
         const blobImg = document.createElement('img');
         if (score.blobtype === 'gold'){
@@ -245,13 +301,14 @@ function postScores(todaysScores, todaysBoard) {
         blobImg.height = 15;
         blobImg.width = 15;
         blobImg.style = 'display:inline';
-        let user = Users.find(user => user.id === score.user_id)
-        if (i < 11) {
-        let li = document.createElement('li')
-        li.textContent = `#${i} ${score.time} seconds by ${user.name}`
-        i += 1
-        li.append(blobImg);
-        ul.append(li)
+        let user = Users.find(user => user.id == score.user_id)
+        console.log('USER', user)
+        if (i < 11 && user) {
+            let li = document.createElement('li');
+            li.textContent = `#${i} ${score.time} seconds by ${user.name} on ${score.date}`; // Adding the date to the score display
+            i += 1;
+            li.append(blobImg);
+            ul.append(li);
         }
     })
     
