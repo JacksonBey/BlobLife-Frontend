@@ -20,26 +20,39 @@ let currentDate = new Date();
 let date = `${currentDate.getMonth()+1}/${currentDate.getDate()}/${currentDate.getFullYear()}`
 
 
-let leaderboards = []
-let scores = []
+// let leaderboards = []
+// let scores = []
+
+let leaderboards = getLeaderBoards();
+let scores = getScores();
+
+// function getLeaderBoards(){
+//     fetch(leaderboardUrl)
+//     .then(res => res.json())
+//     .then(Leaderboards => {
+//         Leaderboards.forEach(leaderboard => leaderboards.push(leaderboard))
+//         // addLeaderBoard(leaderboards)
+//         getScores(leaderboards)
+//     })
+// }
+
+// function getScores(leaderboards){
+//     fetch(scoreUrl)
+//     .then(res => res.json())
+//     .then(Scores => {
+//         Scores.forEach(score => scores.push(score))
+//         addLeaderBoard(leaderboards, scores)
+//     })
+// }
 
 function getLeaderBoards(){
-    fetch(leaderboardUrl)
-    .then(res => res.json())
-    .then(Leaderboards => {
-        Leaderboards.forEach(leaderboard => leaderboards.push(leaderboard))
-        // addLeaderBoard(leaderboards)
-        getScores(leaderboards)
-    })
+    let Leaderboards = JSON.parse(localStorage.getItem('leaderboards')) || [];
+    return Leaderboards;
 }
 
-function getScores(leaderboards){
-    fetch(scoreUrl)
-    .then(res => res.json())
-    .then(Scores => {
-        Scores.forEach(score => scores.push(score))
-        addLeaderBoard(leaderboards, scores)
-    })
+function getScores(){
+    let Scores = JSON.parse(localStorage.getItem('scores')) || [];
+    return Scores;
 }
 
 //comapare function for sorting scores
@@ -62,8 +75,9 @@ function compare(a, b) {
 
 
 function addLeaderBoard(leaderboards, scores){
-    let todaysBoard = leaderboards.find(leaderboard => leaderboard.date === date)
-    let todaysScores = scores.filter(score => score.date === date )
+    let todaysBoard = leaderboards.find(leaderboard => leaderboard.date === date);
+    let todaysScores = scores.filter(score => score.date === date);
+
     // todaysScores.sort(compare)
     if ((!!todaysBoard)) {
         let boardDiv = document.createElement('div')
@@ -82,29 +96,34 @@ function addLeaderBoard(leaderboards, scores){
         postScores(todaysScores, todaysBoard)
 
     } else {
-        fetch((leaderboardUrl), {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                'date': date
-            })
+        // fetch((leaderboardUrl), {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //         'Accept': 'application/json'
+        //     },
+        //     body: JSON.stringify({
+        //         'date': date
+        //     })
 
-        })
-        .then(res => res.json())
-        .then(todaysBoard => {
-            let boardDiv = document.createElement('div')
-            boardDiv.setAttribute('class', 'leaderboard')
+        // })
+        // .then(res => res.json())
+        // .then(todaysBoard => {
+        //     let boardDiv = document.createElement('div')
+        //     boardDiv.setAttribute('class', 'leaderboard')
 
-            let ul = document.createElement('ul')
-            ul.textContent = `${todaysBoard.date}'s Top 10 Scores:`
-            ul.id = `${todaysBoard.id}l` // l for leaderboard
-            leaderboards.push(todaysBoard)
-            boardDiv.append(ul)
-            sidebar.append(boardDiv)
-        })
+        //     let ul = document.createElement('ul')
+        //     ul.textContent = `${todaysBoard.date}'s Top 10 Scores:`
+        //     ul.id = `${todaysBoard.id}l` // l for leaderboard
+        //     leaderboards.push(todaysBoard)
+        //     boardDiv.append(ul)
+        //     sidebar.append(boardDiv)
+        // })
+        let newBoard = {
+            'date': date
+        };
+        leaderboards.push(newBoard);
+        localStorage.setItem('leaderboards', JSON.stringify(leaderboards));
     }
 }
 
@@ -133,10 +152,9 @@ function startTime() {
 }
 
 function createScore(time, userid) {
-    let todaysBoard = leaderboards.find(leaderboard => leaderboard.date === date)
-    let todaysScores = scores.filter(score => score.date === date )
-    //let ul = document.getElementById(`${todaysBoard.id}l`)
-    let blobinfo = document.getElementById('blob').textContent
+    let todaysBoard = leaderboards.find(leaderboard => leaderboard.date === date);
+    let todaysScores = scores.filter(score => score.date === date);
+    let blobinfo = document.getElementById('blob').textContent;
     let blobtype;
     if (blobinfo === 'Blob type: Gold'){
         blobtype = 'gold'
@@ -150,35 +168,47 @@ function createScore(time, userid) {
         blobtype = 'grey'
     }
 
-    fetch((scoreUrl), {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-            'time': time,
-            'user_id': userid,
-            'leaderboard_id': todaysBoard.id,
-            'date': date,
-            'blobtype': blobtype
-        })
-    })
-    .then(res => res.json())
-    .then( score => {
-        // create posting score logic here? or perhaps send to a function
-        // find or create leaderboard based on todays date
-        // add this score to the board
-        // let user = Users.find(user => user.id === score.user_id)
-        // let li = document.createElement('li')
-        // li.textContent = `${parseInt(score.time)} seconds by ${user.name}`
+    let newScore = {
+        'time': time,
+        'user_id': userid,
+        'leaderboard_id': todaysBoard.id,
+        'date': date,
+        'blobtype': blobtype
+    };
+    scores.push(newScore);
+    todaysScores.push(newScore);
+    localStorage.setItem('scores', JSON.stringify(scores));
+    postScores(todaysScores, todaysBoard);
 
-        // ul.append(li)
-        scores.push(score)
-        todaysScores.push(score)
-        postScores(todaysScores, todaysBoard)
+    // fetch((scoreUrl), {
+    //     method: 'POST',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //         'Accept': 'application/json'
+    //     },
+    //     body: JSON.stringify({
+    //         'time': time,
+    //         'user_id': userid,
+    //         'leaderboard_id': todaysBoard.id,
+    //         'date': date,
+    //         'blobtype': blobtype
+    //     })
+    // })
+    // .then(res => res.json())
+    // .then( score => {
+    //     // create posting score logic here? or perhaps send to a function
+    //     // find or create leaderboard based on todays date
+    //     // add this score to the board
+    //     // let user = Users.find(user => user.id === score.user_id)
+    //     // let li = document.createElement('li')
+    //     // li.textContent = `${parseInt(score.time)} seconds by ${user.name}`
 
-    })
+    //     // ul.append(li)
+    //     scores.push(score)
+    //     todaysScores.push(score)
+    //     postScores(todaysScores, todaysBoard)
+
+    // })
 
 }
 

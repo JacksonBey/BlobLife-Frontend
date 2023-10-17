@@ -16,7 +16,7 @@ function userForm() {
     `
     body.appendChild(formDiv)
 
-    getUsers()
+    let Users = getUsers();
     document.getElementById('user-login').addEventListener('submit', (e) => {
         e.preventDefault()
         let player = document.getElementById('username').value
@@ -30,38 +30,38 @@ function userForm() {
             selectBlob()
         } 
         else {
-            fetch(userUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    'name': player
-                })
-            })
-            .then(res => res.json())
-            .then( user => {
-                let h3 = document.createElement('h3')
-                h3.textContent = `User: ${user.name}`
-                h3.id= user.id
-                sidebar.appendChild(h3)
-                // startBlob()
-                Users.push(user);
-                selectBlob()
-            })
+            let newUser = {
+                'name': player,
+                'id': Users.length + 1  // Assuming id is a simple increment.
+            };
+    
+            // Instead of the fetch, push the new user to Users and update localStorage
+            Users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(Users));
+    
+            // Rest of your logic remains the same.
+            let h3 = document.createElement('h3');
+            h3.textContent = `User: ${newUser.name}`;
+            h3.id= newUser.id;
+            sidebar.appendChild(h3);
+            selectBlob();
         }
        
     })
 }
 
+// function getUsers() {
+//     fetch(userUrl)
+//     .then(res => res.json())
+//     .then(users =>{
+//         // console.log(users)
+//         users.forEach(user => Users.push(user))
+//     })
+// }
 function getUsers() {
-    fetch(userUrl)
-    .then(res => res.json())
-    .then(users =>{
-        // console.log(users)
-        users.forEach(user => Users.push(user))
-    })
+    // Retrieve users from localStorage
+    let users = JSON.parse(localStorage.getItem('users')) || [];
+    return users;
 }
 
 function selectBlob() {
